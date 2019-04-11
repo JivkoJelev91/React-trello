@@ -51,6 +51,7 @@ module.exports = app => {
             id: prevLane
         }).then((lanes) => {
             let movedCard = lanes.cards.pop();
+
             lanes.save();
 
             Lanes.findOne({
@@ -58,9 +59,29 @@ module.exports = app => {
             }).then((lanes) => {
                 lanes.cards.push(movedCard)
                 lanes.save();
-                console.log(lanes)
             });
-        });
+        }).catch(err => console.log(err));
+    })
+
+
+    app.delete('/delete', (req, res) => {
+
+        let { prevLane,nextLane } = req.query;
+
+        Lanes.findOne({
+            id: nextLane
+        }).then((lanes) => {
+
+            lanes.cards.map((lane, index) => {
+                if (lane.id === prevLane) {
+                    lanes.cards.splice(index, 1);
+                }
+            });
+
+            lanes.save();
+
+        }).catch(err => console.log(err))
+
     })
 
 }

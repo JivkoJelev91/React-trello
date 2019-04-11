@@ -37,7 +37,7 @@ class App extends Component {
     }
 
     async componentWillMount() {
-        const response = await this.getLanes();
+        let response = await this.getLanes();
         this.setState({boardData: response});
     }
 
@@ -70,6 +70,15 @@ class App extends Component {
       }).catch(err => console.log(err))
     }
 
+    onCardDelete = (cardId, laneId) => {
+        axios.delete(`http://localhost:5432/delete?prevLane=${cardId}&nextLane=${laneId}`, {
+            cardId,
+            laneId,
+        });
+
+        console.log(cardId, laneId);
+    }
+
     render() {
         console.log(this.state.boardData);
         return (
@@ -87,6 +96,7 @@ class App extends Component {
                         eventBusHandle={this.setEventBus}
                         handleDragStart={this.handleDragStart}
                         handleDragEnd={this.handleDragEnd}
+                        onCardDelete={this.onCardDelete}
                     />
                 </div>
             </div>
