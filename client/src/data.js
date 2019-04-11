@@ -1,4 +1,4 @@
-{
+let arr = {
   "lanes": [
     {
       "id": "PLANNED",
@@ -86,3 +86,5 @@
     }
   ]
 }
+
+module.exports = arr;

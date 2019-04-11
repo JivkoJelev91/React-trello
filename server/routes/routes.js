@@ -1,15 +1,12 @@
 const mongoose = require('mongoose');
 const Lanes = mongoose.model('Lanes');
-const Cards = mongoose.model('Cards');
 
 module.exports = app => {
     app.get('/', (req, res) => {
-        console.log('bv');
         Lanes.find({})
-            .then(lane => {
-                console.log(lane);
+            .then(lanes => {
                 res.json({
-                    lane: lane
+                    lanes: lanes
                 });
             })
             .catch(err => console.log(err))
@@ -22,16 +19,48 @@ module.exports = app => {
             description
         } = req.body;
 
-        Cards.create({
-            title,
-            description
-        }).then(card => {
-            Lanes.findOne({_id: id}).then((lanes) => {
-                res.json({
-                    lanes: lanes,
-                    card: card
-                })
+        Lanes.findOne({
+            id: id
+        }).then((lanes) => {
+            lanes.cards.push({
+                id: title,
+                title: title,
+                description: description
+            });
+
+            lanes.save().then(() => {
+                Lanes.find({})
+                    .then(lanes => {
+                        res.json({
+                            lanes: lanes,
+                        });
+                    }).catch(err => console.log(err))
             })
+
         }).catch(err => console.log(err))
-    });
+    })
+
+    app.post('/update', (req, res) => {
+        let {
+            prevLane,
+            nextLane,
+            cardId
+        } = req.query;
+
+        Lanes.findOne({
+            id: prevLane
+        }).then((lanes) => {
+            let movedCard = lanes.cards.pop();
+            lanes.save();
+
+            Lanes.findOne({
+                id: nextLane
+            }).then((lanes) => {
+                lanes.cards.push(movedCard)
+                lanes.save();
+                console.log(lanes)
+            });
+        });
+    })
+
 }

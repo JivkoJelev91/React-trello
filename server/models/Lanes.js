@@ -1,12 +1,21 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
 const LanesSchema = new mongoose.Schema({
-    name: { type: String,  },
-    title: { type: String, },
+    id:{
+        type: String,
+    },
+    name: {
+        type: String,
+    },
+    title: {
+        type: String,
+    },
+    cards: {
+        type: Array
+    },
 });
 
-const allLanes = ['Planned Tasks', 'Work in progress', 'Test', 'Completed', 'Archived'] 
+const allLanes = ['Planned', 'WIP', 'Test', 'Completed', 'Archived'];
 
 const Lanes = mongoose.model('Lanes', LanesSchema);
 
@@ -15,17 +24,17 @@ Lanes.getInit = async () => {
         let lanes = await Lanes.find();
         if (lanes.length > 0) return;
 
-        return allLanes.map(lane => {
+        return allLanes.map((lane,key) => {
             return Lanes.create({
+                id: lane.toUpperCase(),
                 name: lane.toUpperCase(),
                 title: lane,
+                cards: [],
             });
         });
-      
     } catch (e) {
         console.log(e);
     }
 }
 
 module.exports = Lanes;
-  

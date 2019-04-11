@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 const Lanes = require('../models/Lanes');
-const Cards = require('../models/Cards');
 
 const uri = 'mongodb://localhost:27017/react-sprello' 
 
