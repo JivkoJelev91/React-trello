@@ -4,6 +4,7 @@ const Lanes = mongoose.model('Lanes');
 module.exports = app => {
     app.get('/', (req, res) => {
         Lanes.find({})
+            .sort({'name': -1})
             .then(lanes => {
                 res.json({
                     lanes: lanes
@@ -21,7 +22,8 @@ module.exports = app => {
 
         Lanes.findOne({
             id: id
-        }).then((lanes) => {
+        })
+        .then((lanes) => {
             lanes.cards.push({
                 id: title,
                 title: title,
@@ -46,23 +48,28 @@ module.exports = app => {
             nextLane,
             cardId
         } = req.query;
+        let movedCard;
 
         Lanes.findOne({
-            id: prevLane
+            name: prevLane
         }).then((lanes) => {
-            let movedCard = lanes.cards.pop();
+            lanes.cards.map((lane, index) => {
+                if (lane.id === cardId) {
+                    lanes.cards.splice(index, 1);
+                    movedCard = lane;
+                }
+            });
 
             lanes.save();
 
             Lanes.findOne({
                 id: nextLane
             }).then((lanes) => {
-                lanes.cards.push(movedCard)
+                movedCard = lanes.cards.push(movedCard);
                 lanes.save();
             });
         }).catch(err => console.log(err));
     })
-
 
     app.delete('/delete', (req, res) => {
 

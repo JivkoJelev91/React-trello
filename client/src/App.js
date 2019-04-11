@@ -26,7 +26,7 @@ class App extends Component {
         console.log('drag ended')
         console.log(`sourceLaneId: ${sourceLaneId}`)
         console.log(`targetLaneId: ${targetLaneId}`)
-        axios.post(`http://localhost:5432/update?prevLane=${sourceLaneId}&nextLane=${targetLaneId}`, {
+        axios.post(`http://localhost:5432/update?prevLane=${sourceLaneId}&nextLane=${targetLaneId}&cardId=${cardId}`, {
             sourceLaneId,
             targetLaneId,
         });
@@ -79,6 +79,10 @@ class App extends Component {
         console.log(cardId, laneId);
     }
 
+    laneSortFunction = (card1,card2) => {
+        return card1 - card2;
+    }
+
     render() {
         console.log(this.state.boardData);
         return (
@@ -97,6 +101,7 @@ class App extends Component {
                         handleDragStart={this.handleDragStart}
                         handleDragEnd={this.handleDragEnd}
                         onCardDelete={this.onCardDelete}
+                        laneSortFunction={this.laneSortFunction}
                     />
                 </div>
             </div>
