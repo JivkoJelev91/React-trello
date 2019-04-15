@@ -6,7 +6,6 @@ const app = express();
 const port = 5432;
 
 const db = require('./config/db');
-// const Gig = require('./models/Gig');
 
 app.use(bodyParser.urlencoded({
     extended: true

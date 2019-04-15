@@ -24,7 +24,7 @@ Lanes.getInit = async () => {
         let lanes = await Lanes.find();
         if (lanes.length > 0) return;
 
-        return allLanes.map((lane,key) => {
+        return allLanes.map((lane) => {
             return Lanes.create({
                 id: lane.toUpperCase(),
                 name: lane.toUpperCase(),

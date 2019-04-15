@@ -1,19 +1,14 @@
-import React, {Component} from 'react'
-import './App.css'
-import {Board} from 'react-trello';
+import React, {Component} from 'react';
+import { Board } from 'react-trello';
 import axios from 'axios';
-
-
-const data = require('./data.js')
-
-
+import './App.css';
 
 class App extends Component {
-
     state = {
+        nextData: [],
         boardData: {
             lanes: []
-        }
+        },
     }
 
     handleDragStart = (cardId, laneId) => {
@@ -26,9 +21,22 @@ class App extends Component {
         console.log('drag ended')
         console.log(`sourceLaneId: ${sourceLaneId}`)
         console.log(`targetLaneId: ${targetLaneId}`)
-        axios.post(`http://localhost:5432/update?prevLane=${sourceLaneId}&nextLane=${targetLaneId}&cardId=${cardId}`, {
+
+        let movedEleIndex;
+
+        this.state.nextData.lanes.map((lane) => {
+            lane.cards.map((card,index) => {
+                if(card.id === cardId){
+                    movedEleIndex = index;
+                }
+            })
+        })
+
+        axios.post(`http://localhost:5432/update?prevLane=${sourceLaneId}&nextLane=${targetLaneId}&cardId=${cardId}&movedIndex=${movedEleIndex}`, {
             sourceLaneId,
             targetLaneId,
+            cardId,
+            movedEleIndex
         });
     }
 
@@ -51,8 +59,9 @@ class App extends Component {
     }
 
     shouldReceiveNewData = nextData => {
-        // console.log('New card has been added')
-        // console.log(nextData)
+        console.log('New card has been added')
+        console.log(nextData)
+        this.setState({nextData: nextData});
     }
 
     handleCardAdd = (card, laneId) => {
@@ -71,37 +80,30 @@ class App extends Component {
     }
 
     onCardDelete = (cardId, laneId) => {
+        console.log(cardId, laneId);
         axios.delete(`http://localhost:5432/delete?prevLane=${cardId}&nextLane=${laneId}`, {
             cardId,
             laneId,
         });
-
-        console.log(cardId, laneId);
-    }
-
-    laneSortFunction = (card1,card2) => {
-        return card1 - card2;
     }
 
     render() {
-        console.log(this.state.boardData);
         return (
             <div className="App">
                 <div className="App-header">
                     <h3>React Trello Demo</h3>
                 </div>
-                <div className="App-intro">
+                <div className="App-intro" >
                     <Board
                         editable
+                        draggable
 						onCardAdd={this.handleCardAdd}
                         data={this.state.boardData}
-                        draggable
                         onDataChange={this.shouldReceiveNewData}
                         eventBusHandle={this.setEventBus}
                         handleDragStart={this.handleDragStart}
                         handleDragEnd={this.handleDragEnd}
                         onCardDelete={this.onCardDelete}
-                        laneSortFunction={this.laneSortFunction}
                     />
                 </div>
             </div>
